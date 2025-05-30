@@ -1,0 +1,230 @@
+{% extends "store/base.html" %}
+
+<!-- ******this is comment -->
+{% load static %}
+
+<!-- ******this is comment -->
+{% block css_files %}
+
+<!-- ******this is comment -->
+
+<link rel="stylesheet" href="{% static "css/list/List.css" %}"/>
+
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.0/nouislider.min.css"
+/>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.0/nouislider.min.js"></script>
+
+<style>
+  .noUi-connect {
+    background: #007bff;
+  }
+  .noUi-handle {
+    background: #fff;
+    border: 2px solid #007bff;
+    box-shadow: none;
+  }
+</style>
+
+<!-- ******this is comment -->
+{% endblock css_files %}
+
+<!-- ******this is comment -->
+{% block content %}
+
+<br />
+<div class="container">
+  <div class="row">
+    <!-- Filter Sidebar -->
+    <div class="col-lg-3">
+      <div class="filter-sidebar">
+        <h3>Filter Products</h3>
+        <hr />
+
+        <!-- Price Range -->
+        {% comment %}
+        <div class="filter-section">
+          <h4>Price Range</h4>
+          <div class="price-range">
+            <input
+              type="range"
+              class="form-range"
+              min="0"
+              max="1000"
+              id="priceRange"
+            />
+            <div class="d-flex justify-content-between">
+              <span>$0</span>
+              <span>$1000</span>
+            </div>
+          </div>
+        </div>
+        {% endcomment %}
+
+        <!-- Price Range Filter -->
+        <div class="filter-section">
+          <h4>Price Range</h4>
+          <div class="price-range">
+            <!-- Selected Prices Display -->
+            <div class="selected-prices mb-3">
+              <span>Min: $<span id="minPriceValue">0</span></span>
+              <span>Max: $<span id="maxPriceValue">150</span></span>
+            </div>
+
+            <!-- Two-Thumb Slider -->
+            <div id="priceSlider" class="mb-3"></div>
+
+            <!-- Hidden form for server-side filtering -->
+            <form method="get" id="priceFilterForm">
+              <input type="hidden" name="min_price" id="minPriceInput" />
+              <input type="hidden" name="max_price" id="maxPriceInput" />
+            </form>
+          </div>
+        </div>
+        <!-- **************************************************************** -->
+
+        <!-- Rating Filter -->
+{#        <div class="filter-section">#}
+{#          <h4>Rating</h4>#}
+{#          <div class="form-check">#}
+{#            <input class="form-check-input" type="checkbox" value="5" />#}
+{#            <label class="form-check-label">★★★★★</label>#}
+{#          </div>#}
+{#          <div class="form-check">#}
+{#            <input class="form-check-input" type="checkbox" value="4" />#}
+{#            <label class="form-check-label">★★★★☆</label>#}
+{#          </div>#}
+{#          <div class="form-check">#}
+{#            <input class="form-check-input" type="checkbox" value="3" />#}
+{#            <label class="form-check-label">★★★☆☆</label>#}
+{#          </div>#}
+{#          <div class="form-check">#}
+{#            <input class="form-check-input" type="checkbox" value="2" />#}
+{#            <label class="form-check-label">★★☆☆☆</label>#}
+{#          </div>#}
+{#          <div class="form-check">#}
+{#            <input class="form-check-input" type="checkbox" value="1" />#}
+{#            <label class="form-check-label">★☆☆☆☆</label>#}
+{#          </div>#}
+{#        </div>#}
+
+        
+        
+          <!-- Sorting Dropdown -->
+          <div class="sorting mb-4">
+              <form method="get" id="sortForm">
+                  <select name="sort" class="form-select" onchange="this.form.submit()">
+                      <option value="">Sort By</option>
+                      <option value="newest" {% if request.GET.sort == 'newest' %}selected{% endif %}>Newest First</option>
+                      <option value="title_asc" {% if request.GET.sort == 'title_asc' %}selected{% endif %}>Name: A-Z</option>
+                      <option value="title_desc" {% if request.GET.sort == 'title_desc' %}selected{% endif %}>Name: Z-A</option>
+                      <option value="price_asc" {% if request.GET.sort == 'price_asc' %}selected{% endif %}>Price: Low to High</option>
+                      <option value="price_desc" {% if request.GET.sort == 'price_desc' %}selected{% endif %}>Price: High to Low</option>
+                  </select>
+                  <input type="hidden" name="min_price" value="{{ current_min }}">
+                  <input type="hidden" name="max_price" value="{{ current_max }}">
+              </form>
+          </div>
+
+
+
+          <div class="reset-filters mt-3">
+            <a href="{% url 'list-category' category.slug %}" class="btn btn-secondary">
+                <i class="bi bi-arrow-counterclockwise"></i> Reset All Filters
+            </a>
+          </div>
+
+
+
+
+      </div>
+    </div>
+
+    <!-- Product Grid -->
+    <div class="col-lg-9">
+      <div class="category-header">
+        <h2 class="category-title">{{ category.name | capfirst }}</h2>
+        <hr class="category-divider" />
+      </div>
+
+      <div class="product-grid">
+        {% for product in products %}
+        <div class="product-card">
+          <div class="product-image-container">
+            <img
+              class="product-image"
+              src="{{ product.image.url }}"
+              alt="{{ product.title }}"
+            />
+{#            <div class="product-actions">#}
+{#              <!-- ******we need to work with rating -->#}
+{#              <button class="action-button">★</button>#}
+{#            </div>#}
+            <!-- <button class="add-to-cart">Add to cart →</button> -->
+          </div>
+          <div class="product-info">
+            <a href="{{ product.get_absolute_url }}" class="product-title"
+              >{{ product.title }}</a
+            >
+
+            <div class="price-section">
+              <span class="current-price">${{ product.price }}</span>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+<br />
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // Initialize slider
+    const priceSlider = document.getElementById("priceSlider");
+    const minPriceInput = document.getElementById("minPriceInput");
+    const maxPriceInput = document.getElementById("maxPriceInput");
+    const minPriceValue = document.getElementById("minPriceValue");
+    const maxPriceValue = document.getElementById("maxPriceValue");
+
+    // Get initial values from URL params
+    const urlParams = new URLSearchParams(window.location.search);
+    const initialMin = parseInt(urlParams.get("min_price")) || 0;
+    const initialMax = parseInt(urlParams.get("max_price")) || 1000;
+
+    noUiSlider.create(priceSlider, {
+      start: [initialMin, initialMax],
+      connect: true,
+      range: {
+        min: 0,
+        max: 150,
+      },
+      step: 2,
+    });
+
+    // Update display values and hidden inputs
+    priceSlider.noUiSlider.on("update", function (values, handle) {
+      const min = parseFloat(values[0]).toFixed(2);
+      const max = parseFloat(values[1]).toFixed(2);
+
+      minPriceValue.textContent = min;
+      maxPriceValue.textContent = max;
+
+      minPriceInput.value = min;
+      maxPriceInput.value = max;
+    });
+
+    // Submit form when slider stops changing
+    priceSlider.noUiSlider.on("set", function () {
+      const sortValue = document.querySelector('[name="sort"]').value;
+      const sortInput = document.createElement('input');
+      sortInput.type = 'hidden';
+      sortInput.name = 'sort';
+      sortInput.value = sortValue;
+      document.getElementById('priceFilterForm').appendChild(sortInput);
+      document.getElementById("priceFilterForm").submit();
+    });
+  });
+</script>
+{% endblock %}

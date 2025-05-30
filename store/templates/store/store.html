@@ -1,0 +1,192 @@
+{% extends 'store/base.html' %}
+
+{% load static %}
+
+{load css}
+
+
+
+
+
+
+{% block css_files %}
+
+   
+    <link rel="stylesheet" href="{% static "css/store/head.css" %}"/>
+    
+
+{% endblock css_files %}
+
+{% block content %}
+
+
+
+    <!-- carousel --> 
+    <!-- ******We have to add proper links -->
+
+  <div class="carousel-container">
+   
+    <div class="carousel-slide active">
+      <div class="carousel-content">
+        <div class="text-content">
+          <div class="new-arrivals">New Arrivals</div>
+          <div class="fall-season">Fall Season</div>
+          <div class="trending">Trending</div>
+          <a href="#" class="learn-more">Learn More →</a>
+        </div>
+        <div class="image-container">
+          <img src="/static/media/images/dunesOfDubai.jpg" alt="Fashion models" class="carousel-image">
+        </div>
+      </div>
+    </div>
+
+    <div class="carousel-slide">
+      <div class="carousel-content">
+        <div class="text-content">
+          <div class="new-arrivals">Featured Collection</div>
+          <div class="fall-season">Winter Style</div>
+          <div class="trending">Essential</div>
+          <a href="#" class="learn-more">Shop Now →</a>
+        </div>
+        <div class="image-container">
+          <img src="/static/media/images/Maverick_Mens_Moccasin.jpg" alt="Winter collection" class="carousel-image">
+        </div>
+      </div>
+    </div>
+
+    <div class="carousel-slide">
+      <div class="carousel-content">
+        <div class="text-content">
+          <div class="new-arrivals">Limited Edition</div>
+          <div class="fall-season">Designer Pick</div>
+          <div class="trending">Luxurious</div>
+          <a href="#" class="learn-more">Discover →</a>
+        </div>
+        <div class="image-container">
+          <img  src="/static/media/images/banner1.png" alt="Luxury fashion" class="carousel-image">
+        </div>
+      </div>
+    </div>
+    
+    <div class="arrow arrow-left">←</div>
+    <div class="arrow arrow-right">→</div>
+    
+    <div class="navigation">
+      <div class="nav-dot active"></div>
+      <div class="nav-dot"></div>
+      <div class="nav-dot"></div>
+    </div>
+  </div>
+
+
+
+
+
+       <!-- All products section -->
+
+    <div class="album py-5">
+
+      
+
+        <div class="container">
+
+
+          <h1 class="text-xl-center"> All Product </h1>
+
+
+          
+
+
+          <hr>
+
+          <br>
+
+          <div class="sorting-options">
+            <form method="get">
+                <select name="sort" onchange="this.form.submit()">
+                    <option value="">Sort by</option>
+                    <option value="price_asc" {% if request.GET.sort == 'price_asc' %}selected{% endif %}>
+                        Price: Low to High
+                    </option>
+                    <option value="price_desc" {% if request.GET.sort == 'price_desc' %}selected{% endif %}>
+                        Price: High to Low
+                    </option>
+                    <option value="title_asc" {% if request.GET.sort == 'title_asc' %}selected{% endif %}>
+                        Name: A-Z
+                    </option>
+                    <option value="title_desc" {% if request.GET.sort == 'title_desc' %}selected{% endif %}>
+                        Name: Z-A
+                    </option>
+                    <option value="newest" {% if request.GET.sort == 'newest' %}selected{% endif %}>
+                        Newest
+                    </option>
+                </select>
+            </form>
+        </div>
+
+
+                
+            
+            
+
+          
+          <div class="product-grid">
+            {% for product in my_products %}
+            <div class="product-card">
+              <div class="product-image-container">
+                <img class="product-image" src="{{ product.image.url }}" alt="{{ product.title }}">
+                <!-- <div class="product-actions">
+                  
+                  <button class="action-button">★</button>
+                  
+                </div>
+                    -->
+
+                
+
+                  <!-- ******We have to add cart functionality -->
+                  
+                  <!-- <button type="button" id="add-button" value="{{ product.id }}" 
+                        class="btn btn-danger  btn-lg">
+                    ADD TO CART
+                </button> -->
+
+
+              </div>
+              <div class="product-info">
+                <div class="product-category">{{ product.category }}</div>
+                <a href="{{ product.get_absolute_url }}" class="product-title">{{ product.title|capfirst }}</a>
+                
+                <div class="price-section">
+                  <span class="current-price">${{ product.price }}</span>
+                 
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+
+
+
+
+        </div>
+      </div>
+
+
+      
+      
+
+      <script src="{% static "js/head.js" %}"> </script>
+      <script src="{% static "js/store/carousel.js" %}"> </script>
+
+
+
+
+
+
+
+{% endblock %}
+
+
+
+

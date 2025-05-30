@@ -1,0 +1,127 @@
+{% extends "store/base.html" %}
+
+{% load static %}
+
+{% block content %}
+
+<style>
+    .verification-container {
+        min-height: 70vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .verification-card {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        padding: 2.5rem;
+        max-width: 500px;
+        width: 100%;
+        text-align: center;
+        transition: transform 0.3s ease;
+    }
+    
+    .verification-card:hover {
+        transform: translateY(-5px);
+    }
+    
+    .icon-circle {
+        background: #f8f9fa;
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 auto 1.5rem;
+    }
+    
+    .verification-title {
+        color: #2c3e50;
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+        font-weight: 600;
+    }
+    
+    .verification-text {
+        color: #6c757d;
+        font-size: 1.1rem;
+        margin-bottom: 1.5rem;
+        line-height: 1.6;
+    }
+    
+    .divider {
+        border-top: 2px solid #f1f1f1;
+        margin: 1.5rem 0;
+    }
+    
+    .info-box {
+        background: #fff2f2;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-top: 1rem;
+        border: 1px solid #ffe0e0;
+    }
+    
+    .btn-primary {
+        background-color: #3498db;
+        border-color: #3498db;
+        padding: 10px 20px;
+        font-size: 1rem;
+        border-radius: 5px;
+        transition: all 0.3s;
+        margin-right: 10px;
+    }
+    
+    .btn-primary:hover {
+        background-color: #2980b9;
+        border-color: #2980b9;
+        transform: translateY(-2px);
+    }
+    
+    .btn-outline-secondary {
+        color: #6c757d;
+        border-color: #6c757d;
+        padding: 10px 20px;
+        font-size: 1rem;
+        border-radius: 5px;
+        transition: all 0.3s;
+    }
+    
+    .btn-outline-secondary:hover {
+        background-color: #6c757d;
+        color: white;
+        transform: translateY(-2px);
+    }
+</style>
+
+<div class="verification-container">
+    <div class="verification-card">
+        <div class="icon-circle">
+            <i class="fa fa-times fa-2x" style="color: #e74c3c;" aria-hidden="true"></i>
+        </div>
+        
+        <h1 class="verification-title">Verification Failed</h1>
+        
+        <p class="verification-text">
+            We couldn't verify your email address. This may happen due to an expired or invalid verification link.
+        </p>
+        
+        <div class="divider"></div>
+        
+        <div class="info-box">
+            <p class="mb-3" style="color: #e74c3c;">
+                <i class="fa fa-info-circle" aria-hidden="true"></i>
+                If you continue to experience issues, please contact our support team for assistance.
+            </p>
+        </div>
+        
+       
+    </div>
+</div>
+
+{% endblock %}
+
+

@@ -1,0 +1,384 @@
+{% extends "store/base.html" %}
+{% load static %}
+
+{% block css_files %}
+    <!-- <link rel="stylesheet" href="{% static "css/store/head.css" %}"/> -->
+    <link rel="stylesheet" href="{% static "css/product-info/info.css" %}"/>
+{% endblock css_files %}
+
+{% block content %}
+<div class="container mt-5">
+    <!-- ******this is comment -->
+    <div class="row">
+        <!-- Product Images Section -->
+        {% comment %}
+        <div class="col-md-1">
+            <!-- Thumbnail Images -->
+            <div class="small-img-column">
+                {% if product.additional_images.all %}
+                    {% for img in product.additional_images.all %}
+                        <img src="{{ img.image.url }}" class="small-img mb-2 w-100" alt="Product thumbnail">
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+        {% endcomment %}
+
+        <!-- Main Product Image -->
+        <div class="col-md-5">
+            <img class="img-fluid" src="{{ product.image.url }}" alt="{{ product.title }}">
+        </div>
+
+        <!-- Product Details Section -->
+        <div class="col-md-6">
+            <h1 class="h4 mb-3">{{ product.title }}</h1>
+
+            <!-- Price -->
+            <h2 class="h5 mb-4">${{ product.price }}</h2>
+
+            <!-- Description -->
+            <p class="mb-4">{{ product.description }}</p>
+
+            <!-- Availability Status -->
+            <div class="mb-4">
+                <span class="text-muted">AVAILABLE:</span>
+                {% if product.quantity > 0 %}
+                    <span class="text-success ms-2" id="stock-status">IN STOCK</span>
+                    {% if product.quantity < 5 %}
+                        <span class="text-danger ms-2" id="stock-warning">Only {{ product.quantity }} left!</span>
+                    {% endif %}
+                {% else %}
+                    <span class="text-danger ms-2" id="stock-status">OUT OF STOCK</span>
+                {% endif %}
+
+                <!-- Show cart quantity if exists -->
+                {% if cart_quantity > 0 %}
+                    <div class="mt-1 text-info">
+                        <small>You already have {{ cart_quantity }} of this item in your cart.</small>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Quantity Selection -->
+            <div class="quantity-section mb-4">
+                <p class="mb-2">QUANTITY:</p>
+                <div class="d-flex align-items-center">
+                    <div class="input-group quantity-control" style="width: 130px;">
+                        <button class="btn btn-outline-secondary decrease-btn" type="button"
+                                {% if product.quantity == 0 %}disabled{% endif %}>-</button>
+                        <input type="text" id="product-quantity" class="form-control text-center" value="1" readonly>
+                        <button class="btn btn-outline-secondary increase-btn" type="button"
+                                {% if product.quantity == 0 or remaining_stock <= 0 %}disabled{% endif %}>+</button>
+                    </div>
+
+                    <!-- Remaining stock message -->
+                    {% if remaining_stock <= 0 %}
+                        <div class="ms-3 text-danger">
+                            <small>Maximum quantity already in cart</small>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+<!-- Action Buttons -->
+<div class="d-grid gap-2">
+    <button type="button" id="add-button" value="{{ product.id }}"
+            class="btn btn-danger btn-lg"
+            {% if product.quantity == 0 or remaining_stock <= 0 %}disabled{% endif %}>
+        {% if product.quantity == 0 %}
+            OUT OF STOCK
+        {% elif remaining_stock <= 0 %}
+            MAXIMUM IN CART
+        {% else %}
+            ADD TO CART
+        {% endif %}
+    </button>
+</div>
+
+            <!-- Toast Notification -->
+            <div class="toast-container position-fixed bottom-0 end-0 p-3">
+                <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="toast-header">
+                        <strong class="me-auto">H-Store</strong>
+                        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
+                    <div class="toast-body" id="toast-message">
+                        Product added to cart successfully!
+                    </div>
+                </div>
+            </div>
+
+            <!-- Benefits Section -->
+            <div class="card border-danger mb-4 mt-2">
+                <div class="card-body">
+                    <h6 class="text-center font-bold mb-4">THE BENEFITS OF CHOOSING US</h6>
+                    <div class="row text-center g-4">
+                        <div class="col-3">
+                            <div class="benefit-item">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                <p class="small mt-2 mb-0">SUSTAINABLE<br>MATERIALS</p>
+                            </div>
+                        </div>
+                        <div class="col-3">
+                            <div class="benefit-item">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M3 12C3 12 6.27273 5 12 5C17.7273 5 21 12 21 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M21 12C21 12 17.7273 19 12 19C6.27273 19 3 12 3 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                <p class="small mt-2 mb-0">30 DAYS<br>FREE RETURNS</p>
+                            </div>
+                        </div>
+                        <div class="col-3">
+                            <div class="benefit-item">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M3 12H21M3 12L7 8M3 12L7 16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                <p class="small mt-2 mb-0">FREE SHIPPING<br>AND RETURNS</p>
+                            </div>
+                        </div>
+                        <div class="col-3">
+                            <div class="benefit-item">
+                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="2"/>
+                                    <path d="M12 2C14.5013 4.73835 15.9228 8.29203 16 12C15.9228 15.708 14.5013 19.2616 12 22C9.49872 19.2616 8.07725 15.708 8 12C8.07725 8.29203 9.49872 4.73835 12 2Z" stroke="currentColor" stroke-width="2"/>
+                                    <path d="M2 12H22" stroke="currentColor" stroke-width="2"></path>
+                                </svg>
+                                <p class="small mt-2 mb-0">COUNTRYWIDE<br>DELIVERY</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Delivery Info -->
+            <div class="delivery-info">
+                <div class="d-flex align-items-center mb-2">
+                    <svg class="me-2" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M16 5H4C3.44772 5 3 5.44772 3 6V18C3 18.5523 3.44772 19 4 19H16C16.5523 19 17 18.5523 17 18V6C17 5.44772 16.5523 5 16 5Z" stroke="currentColor" stroke-width="2"></path>
+                        <path d="M3 9H17" stroke="currentColor" stroke-width="2"></path>
+                        <path d="M7 13H13" stroke="currentColor" stroke-width="2"></path>
+                    </svg>
+                    <span class="text-muted small">Orders ship within 5 to 10 business days.</span>
+                </div>
+                <div class="d-flex align-items-center">
+                    <svg class="me-2" width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M16 12H21L19 16H16M16 12V16M16 12H14M16 16H14M6 16H14M6 16V12M6 16H3L5 12H6M6 12H14M14 12V16" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                        <path d="M8 12V9C8 7.89543 8.89543 7 10 7H14C15.1046 7 16 7.89543 16 9V12" stroke="currentColor" stroke-width="2"></path>
+                    </svg>
+                    <span class="text-muted small">Hoorey ! This item ships free to the DHAKA</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Product Tabs Section -->
+    <div class="row mt-5">
+        <div class="col-12">
+            <ul class="nav nav-tabs" id="productTabs" role="tablist">
+                <li class="nav-item">
+                    <!-- Updated href to match the content pane id -->
+                    <a class="nav-link active" id="description-tab" data-bs-toggle="tab" href="#description">Instruction</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="delivery-tab" data-bs-toggle="tab" href="#delivery">Delivery Policy</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" id="shipping-tab" data-bs-toggle="tab" href="#shipping">Shipping & Return</a>
+                </li>
+            </ul>
+            <div class="tab-content p-4 border border-top-0">
+                <div class="tab-pane fade show active" id="description">
+                    {{ product.full_description|safe }}
+                    <!-- Care Instructions -->
+                    <div class="care-instructions mt-4">
+                        <h5>Care Instructions:</h5>
+                        <ul class="list-unstyled">
+                            <li>• MACHINE WASH AT MAXIMUM 30°C - NORMAL PROCESS</li>
+                            <li>• DO NOT BLEACH</li>
+                            <li>• DO NOT TUMBLE DRY</li>
+                            <li>• IRON AT MAX. TEMP OF 110°C WITHOUT STEAM</li>
+                            <li>• DO NOT DRY CLEAN</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="delivery">
+                    <!-- Delivery policy content -->
+                    <div>
+                        <h5>Delivery Policy</h5>
+                        <p>
+                            We’re committed to delivering your order promptly and securely. All orders are processed within 1-2 business days and then shipped via our trusted carriers. Typically, you can expect your delivery within 3-7 business days, depending on your location. Once your order has shipped, we will email you the tracking details so you can monitor its progress. Please note that delivery times may vary during peak periods or due to unforeseen circumstances.
+                        </p>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="shipping">
+                    <!-- Shipping & return content -->
+                    <h5>Shipping & Return Policy</h5>
+                    <p>
+                        <strong>Shipping:</strong> We offer both standard and expedited shipping options tailored to your needs. Every order is carefully packaged and comes with tracking information to ensure your package arrives safely. Shipping fees are calculated based on your order total and destination.
+                    </p>
+                    <p>
+                        <strong>Returns:</strong> Your satisfaction is our top priority. If you are not completely satisfied with your purchase, you may return the product within 30 days of delivery. Items must be unused and returned in their original packaging. To start the return process, please contact our customer service team. Once we receive and inspect your return, a refund will be processed to your original method of payment.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rating Section -->
+{#    <div class="card p-4 mt-5 mb-4 shadow-sm w-50">#}
+{#        <h2 class="h4">Rating</h2>#}
+{#        <p class="text-muted">Give the product a 5 Star</p>#}
+{#        <div class="bg-light p-3 rounded">#}
+{#            <p class="mb-2">Click to rate</p>#}
+{#            <div class="rating">#}
+{#                <span class="star" data-rating="1">☆</span>#}
+{#                <span class="star" data-rating="2">☆</span>#}
+{#                <span class="star" data-rating="3">☆</span>#}
+{#                <span class="star" data-rating="4">☆</span>#}
+{#                <span class="star" data-rating="5">☆</span>#}
+{#            </div>#}
+{#        </div>#}
+{#    </div>#}
+</div>
+
+<script>
+    $(document).ready(function () {
+    // Get initial values
+    const maxQuantity = {{ product.quantity }};
+    const cartQuantity = {{ cart_quantity|default:0 }};
+    const remainingStock = {{ remaining_stock|default:product.quantity }};
+    const maxAdditional = {{ max_additional|default:product.quantity }};
+
+    // Check if we need to disable buttons initially
+    checkQuantityStatus();
+
+    $('.increase-btn').on('click', function() {
+        let currentValue = parseInt($('#product-quantity').val());
+        if (currentValue < maxAdditional) {
+            $('#product-quantity').val(currentValue + 1);
+            checkQuantityStatus();
+        }
+    });
+
+    // Handle quantity decrease
+    $('.decrease-btn').on('click', function() {
+        let currentValue = parseInt($('#product-quantity').val());
+        if (currentValue > 1) {
+            $('#product-quantity').val(currentValue - 1);
+            checkQuantityStatus();
+        }
+    });
+
+    // Function to check and update button status
+    function checkQuantityStatus() {
+        let currentValue = parseInt($('#product-quantity').val());
+
+        // Disable decrease button if at 1
+        if (currentValue <= 1) {
+            $('.decrease-btn').prop('disabled', true);
+        } else {
+            $('.decrease-btn').prop('disabled', false);
+        }
+
+        // Disable increase button if at max remaining
+        if (currentValue >= maxAdditional) {
+            $('.increase-btn').prop('disabled', true);
+        } else {
+            $('.increase-btn').prop('disabled', false);
+        }
+
+        // Handle various stock conditions
+        if (maxQuantity === 0) {
+            // Product is completely out of stock
+            $('#add-button').prop('disabled', true);
+            $('#add-button').text('OUT OF STOCK');
+            $('.decrease-btn').prop('disabled', true);
+            $('.increase-btn').prop('disabled', true);
+            $('#stock-status').removeClass('text-success').addClass('text-danger').text('OUT OF STOCK');
+        } else if (remainingStock <= 0) {
+            // Max quantity already in cart
+            $('#add-button').prop('disabled', true);
+            $('#add-button').text('MAXIMUM IN CART');
+        } else if (currentValue > remainingStock) {
+            // Selected quantity exceeds what can be added
+            $('#add-button').prop('disabled', true);
+        } else {
+            // Normal case - can add to cart
+            $('#add-button').prop('disabled', false);
+            $('#add-button').text('ADD TO CART');
+        }
+    }
+
+    $('#add-button').on('click', function (e) {
+        e.preventDefault();
+
+        // Double check to prevent adding more than available
+        let quantityToAdd = parseInt($('#product-quantity').val());
+        if (quantityToAdd > remainingStock) {
+            alert(`Sorry, only ${remainingStock} more items can be added to your cart`);
+            return;
+        }
+
+        $.ajax({
+            type: 'POST',
+            url: '{% url "cart-add" %}',
+            data: {
+                product_id: $('#add-button').val(),
+                product_quantity: $('#product-quantity').val(),
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+                action: 'post'
+            },
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            success: function (json) {
+                if (json.success) {
+                    console.log('Product added to cart:', json);
+                    $('#cart-qty').text(json.qty);
+
+                    // Show feedback that item was added
+                    // Show toast notification
+                        const toastLiveExample = document.getElementById('liveToast');
+                        const toastBootstrap = bootstrap.Toast.getOrCreateInstance(toastLiveExample);
+                        toastBootstrap.show();
+
+                    // Optional: Update the cart quantity display without refresh
+                    // This helps user know how many are now in cart
+                    if (cartQuantity === 0) {
+                        // First time adding this product
+                        $(".availability-section").append(
+                            '<div class="mt-1 text-info cart-qty-info">' +
+                            '<small>You now have ' + quantityToAdd + ' of this item in your cart.</small>' +
+                            '</div>'
+                        );
+                    } else {
+                        // Update existing cart quantity info
+                        $(".cart-qty-info small").text(
+                            'You now have ' + (cartQuantity + quantityToAdd) + ' of this item in your cart.'
+                        );
+                    }
+
+                    // Disable buttons if needed after adding
+                    if (quantityToAdd >= remainingStock) {
+                        $('.increase-btn, #add-button').prop('disabled', true);
+                        $('#add-button').text('MAXIMUM IN CART');
+                    }
+                } else {
+                    alert(json.message);
+                }
+            },
+            error: function (xhr, errmsg, err) {
+                console.error("Error adding to cart:", err);
+                alert("Error adding to cart. Please try again.");
+            }
+            });
+        });
+    });
+</script>
+
+<script src="{% static "js/product-info/info.js" %}"></script>
+{% endblock %}

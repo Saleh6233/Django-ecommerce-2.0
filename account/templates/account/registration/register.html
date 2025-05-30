@@ -1,0 +1,338 @@
+{% extends "store/base.html" %}
+<!-- Comment -->
+{% load static %}
+<!-- Comment -->
+
+{% load crispy_forms_filters %}
+
+<!-- Comment -->
+{% load crispy_forms_tags %}
+<!-- Comment -->
+
+{% block css_files %}
+
+<!-- Comment -->
+
+<link rel="stylesheet" href="{% static "account/registration/register.css" %}"/>
+
+<!-- Comment -->
+
+{% endblock css_files %}
+
+<!-- Comment -->
+
+{% block content %}
+
+<style>
+   .register-section {
+        min-height: 80vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background-color: #f8f9fa;
+        padding: 2rem 1rem;
+    }
+    
+    .register-container {
+        background-color: white;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        width: 100%;
+        max-width: 500px;
+        padding: 2.5rem;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .register-container::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 6px;
+        background: linear-gradient(90deg, #6a11cb, #2575fc);
+    }
+    
+    .brand-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 2rem;
+    }
+    
+    .brand-container svg {
+        width: 45px;
+        height: 45px;
+        margin-right: 12px;
+    }
+    
+    .brand-container h2 {
+        color: #333;
+        font-weight: 700;
+        margin: 0;
+        font-size: 1.75rem;
+        letter-spacing: -0.5px;
+    }
+    
+    .page-title {
+        text-align: center;
+        margin-bottom: 1.5rem;
+        font-size: 1.25rem;
+        color: #444;
+        font-weight: 500;
+    }
+    
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-group label {
+        display: block;
+        color: #555;
+        font-size: 0.9rem;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+    }
+    
+    .form-control {
+        height: calc(3rem + 2px);
+        border: 1.5px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 0.75rem 1rem;
+        transition: all 0.3s ease;
+        font-size: 1rem;
+    }
+    
+    .form-control:focus {
+        border-color: #6a11cb;
+        box-shadow: 0 0 0 0.2rem rgba(106, 17, 203, 0.15);
+    }
+    
+    .form-control.invalid {
+        border-color: #ff3e3e;
+    }
+    
+    .input-group {
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    
+    .input-group-text {
+        background-color: #f8f9fa;
+        border: 1.5px solid #e0e0e0;
+        border-right: none;
+        color: #666;
+        padding: 0.75rem 1rem;
+    }
+    
+    .input-group .form-control {
+        border-left: none;
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+    }
+    
+    .toggle-password {
+        border: 1.5px solid #e0e0e0;
+        border-left: none;
+        background-color: #f8f9fa;
+        color: #666;
+        height: calc(3rem + 2px);
+    }
+    
+    .register-btn {
+        background: linear-gradient(90deg, #6a11cb, #2575fc);
+        border: none;
+        color: white;
+        padding: 0.75rem;
+        border-radius: 8px;
+        width: 100%;
+        font-weight: 600;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        height: 3.25rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .register-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(106, 17, 203, 0.2);
+    }
+    
+    .register-btn:active {
+        transform: translateY(0);
+    }
+    
+    .login-link {
+        color: #6a11cb;
+        text-align: center;
+        margin-top: 1.5rem;
+        display: block;
+        font-weight: 500;
+        font-size: 0.95rem;
+        transition: color 0.2s ease;
+    }
+    
+    .login-link:hover {
+        color: #2575fc;
+        text-decoration: none;
+    }
+    
+    .help-block {
+        background-color: #fff0f0;
+        border-left: 4px solid #ff3e3e;
+        padding: 0.5rem 0.75rem;
+        border-radius: 0 8px 8px 0;
+        margin-top: 0.5rem;
+        color: #d92626;
+        font-size: 0.85rem;
+    }
+    
+    /* Responsive tweaks */
+    @media (max-width: 576px) {
+        .register-container {
+            padding: 2rem 1.5rem;
+        }
+        
+        .brand-container h2 {
+            font-size: 1.5rem;
+        }
+    }
+</style>
+
+<section class="register-section">
+  <div class="register-container">
+      <div class="brand-container">
+          <svg width="45" height="45" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="50" cy="50" r="45" fill="url(#paint0_linear)"/>
+              <defs>
+                  <linearGradient id="paint0_linear" x1="5" y1="50" x2="95" y2="50" gradientUnits="userSpaceOnUse">
+                      <stop stop-color="#6a11cb"/>
+                      <stop offset="1" stop-color="#2575fc"/>
+                  </linearGradient>
+              </defs>
+          </svg>
+          <h2>H-Store</h2>
+      </div>
+      
+      <h3 class="page-title">Create your account</h3>
+      
+      <form method="POST" autocomplete="off">
+          {% csrf_token %}
+          
+          {% for form_field in form %}
+              <div class="form-group">
+                  {{ form_field.label_tag }}
+                  <div class="input-group">
+                      {% if form_field.name == 'username' %}
+                      <div class="input-group-prepend">
+                          <span class="input-group-text">
+                              <i class="fa fa-user"></i>
+                          </span>
+                      </div>
+                      {% endif %}
+                      
+                      {% if form_field.name == 'email' %}
+                      <div class="input-group-prepend">
+                          <span class="input-group-text">
+                              <i class="fa fa-envelope"></i>
+                          </span>
+                      </div>
+                      {% endif %}
+                      
+                      {% if form_field.name == 'password1' or form_field.name == 'password2' %}
+                      <div class="input-group-prepend">
+                          <span class="input-group-text">
+                              <i class="fa fa-lock"></i>
+                          </span>
+                      </div>
+                      {% endif %}
+                      
+                      {% if form_field.name == 'username' %}
+                          <input type="{{ form_field.field.widget.input_type }}" 
+                                 name="{{ form_field.name }}" 
+                                 class="form-control {% if form_field.errors %}is-invalid{% endif %}" 
+                                 id="{{ form_field.id_for_label }}" 
+                                 placeholder="Enter your username" 
+                                 {% if form_field.value %}value="{{ form_field.value }}"{% endif %}
+                                 {% if form_field.field.required %}required{% endif %}>
+                      {% elif form_field.name == 'password1' %}
+                          <input type="{{ form_field.field.widget.input_type }}" 
+                                 name="{{ form_field.name }}" 
+                                 class="form-control {% if form_field.errors %}is-invalid{% endif %}" 
+                                 id="{{ form_field.id_for_label }}" 
+                                 placeholder="Enter your password" 
+                                 {% if form_field.field.required %}required{% endif %}>
+                      {% elif form_field.name == 'password2' %}
+                          <input type="{{ form_field.field.widget.input_type }}" 
+                                 name="{{ form_field.name }}" 
+                                 class="form-control {% if form_field.errors %}is-invalid{% endif %}" 
+                                 id="{{ form_field.id_for_label }}" 
+                                 placeholder="Confirm your password" 
+                                 {% if form_field.field.required %}required{% endif %}>
+                      {% elif form_field.name == 'email' %}
+                          <input type="{{ form_field.field.widget.input_type }}" 
+                                 name="{{ form_field.name }}" 
+                                 class="form-control {% if form_field.errors %}is-invalid{% endif %}" 
+                                 id="{{ form_field.id_for_label }}" 
+                                 placeholder="Enter your email address" 
+                                 {% if form_field.value %}value="{{ form_field.value }}"{% endif %}
+                                 {% if form_field.field.required %}required{% endif %}>
+                      {% else %}
+                          {{ form_field }}
+                      {% endif %}
+                      
+                      {% if form_field.name == 'password1' or form_field.name == 'password2' %}
+                      <div class="input-group-append">
+                          <button class="btn toggle-password" type="button">
+                              <i class="fa fa-eye-slash"></i>
+                          </button>
+                      </div>
+                      {% endif %}
+                  </div>
+                  
+                  {% if form_field.errors %}
+                  <div class="help-block">
+                      {{ form_field.errors }}
+                  </div>
+                  {% endif %}
+              </div>
+          {% endfor %}
+
+          <button type="submit" class="btn register-btn">
+              Create Account
+          </button>
+
+          <a href="{% url 'my-login' %}" class="login-link">
+              Already have an account? Sign in
+          </a>
+      </form>
+  </div>
+</section>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+      const passwordInputs = document.querySelectorAll('input[type="password"]');
+      const togglePasswordBtns = document.querySelectorAll('.toggle-password');
+  
+      togglePasswordBtns.forEach((togglePasswordBtn, index) => {
+          const passwordInput = passwordInputs[index];
+          const eyeIcon = togglePasswordBtn.querySelector('i');
+  
+          togglePasswordBtn.addEventListener('click', function() {
+              if (passwordInput.type === 'password') {
+                  passwordInput.type = 'text';
+                  eyeIcon.classList.remove('fa-eye-slash');
+                  eyeIcon.classList.add('fa-eye');
+              } else {
+                  passwordInput.type = 'password';
+                  eyeIcon.classList.remove('fa-eye');
+                  eyeIcon.classList.add('fa-eye-slash');
+              }
+          });
+      });
+  });
+  </script>
+
+{% endblock %}

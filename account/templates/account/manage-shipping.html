@@ -1,0 +1,211 @@
+{% extends "store/base.html" %}
+{% load crispy_forms_filters %}
+
+
+{% load static %}
+
+{% load crispy_forms_tags %}
+
+
+
+{% block content %}
+
+<style>
+    /* Scoped variables - won't affect global styles */
+    .shipping-page {
+        --shipping-primary: #4a6cf7;
+        --shipping-primary-hover: #3d5ee1;
+        --shipping-secondary: #6b7280;
+        --shipping-success: #10b981;
+        --shipping-danger: #ef4444;
+        --shipping-warning: #f59e0b;
+        --shipping-info: #3b82f6;
+        --shipping-light: #f9fafb;
+        --shipping-dark: #1f2937;
+        --shipping-body-bg: #f1f5f9;
+        --shipping-card-bg: #ffffff;
+        --shipping-border-color: #e2e8f0;
+        --shipping-text-main: #334155;
+        --shipping-text-muted: #64748b;
+        --shipping-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        --shipping-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        --shipping-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        --shipping-radius: 0.5rem;
+        background-color: var(--shipping-body-bg);
+        color: var(--shipping-text-main);
+        padding: 1.5rem 0;
+    }
+
+    /* Page header - scoped to shipping-page */
+    .shipping-page .shipping-page-header {
+        margin-bottom: 1.5rem;
+    }
+
+    .shipping-page .shipping-page-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--shipping-dark);
+        margin-bottom: 0.5rem;
+    }
+
+    .shipping-page .shipping-page-subtitle {
+        font-size: 1rem;
+        color: var(--shipping-text-muted);
+        margin-bottom: 1rem;
+    }
+
+    .shipping-page .shipping-path {
+        display: flex;
+        align-items: center;
+        font-size: 0.875rem;
+        color: var(--shipping-text-muted);
+    }
+
+    .shipping-page .shipping-path a {
+        color: var(--shipping-primary);
+        text-decoration: none;
+    }
+
+    .shipping-page .shipping-path-separator {
+        margin: 0 0.5rem;
+        color: var(--shipping-text-muted);
+    }
+
+    /* Form card - scoped */
+    .shipping-page .shipping-card {
+        background-color: var(--shipping-card-bg);
+        border-radius: var(--shipping-radius);
+        box-shadow: var(--shipping-shadow);
+        margin-bottom: 1.5rem;
+        overflow: hidden;
+    }
+
+    .shipping-page .shipping-card-header {
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid var(--shipping-border-color);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .shipping-page .shipping-card-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        margin: 0;
+        color: var(--shipping-dark);
+        display: flex;
+        align-items: center;
+    }
+
+    .shipping-page .shipping-card-title i {
+        margin-right: 0.5rem;
+        color: var(--shipping-primary);
+    }
+
+    .shipping-page .shipping-card-body {
+        padding: 1.5rem;
+    }
+
+    /* Form styles - scoped */
+    .shipping-page .shipping-form-group {
+        margin-bottom: 1.25rem;
+    }
+
+    .shipping-page .shipping-form-group:last-child {
+        margin-bottom: 0;
+    }
+
+    .shipping-page .shipping-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.75rem 1.5rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        border-radius: var(--shipping-radius);
+        cursor: pointer;
+        transition: all 0.2s;
+        border: none;
+        width: 100%;
+    }
+
+    .shipping-page .shipping-btn-primary {
+        background-color: var(--shipping-primary);
+        color: white;
+    }
+
+    .shipping-page .shipping-btn-primary:hover {
+        background-color: var(--shipping-primary-hover);
+    }
+
+    .shipping-page .shipping-btn i {
+        margin-right: 0.5rem;
+    }
+</style>
+
+<div class="shipping-page">
+    <div class="container">
+        <!-- Page Header -->
+        <div class="shipping-page-header">
+            <h1 class="shipping-page-title">Manage Shipping Address</h1>
+            <div class="shipping-path">
+                <a href="{% url 'store' %}">Home</a>
+                <span class="shipping-path-separator">/</span>
+                <a href="{% url 'dashboard' %}">Dashboard</a>
+                <span class="shipping-path-separator">/</span>
+                <span>Shipping Address</span>
+            </div>
+        </div>
+        
+        <!-- Form Card -->
+        <div class="shipping-card">
+            <div class="shipping-card-header">
+                <h5 class="shipping-card-title">
+                    <i class="fa fa-truck"></i> Shipping Information
+                </h5>
+            </div>
+            <div class="shipping-card-body">
+                <p class="shipping-page-subtitle">Please fill in your shipping address details below.</p>
+                
+                <form method="POST" autocomplete="off">
+                    {% csrf_token %}
+                    
+                    <div class="shipping-form-group">
+                        {{form.full_name|as_crispy_field}}
+                    </div>
+                    
+                    <div class="shipping-form-group">
+                        {{form.email|as_crispy_field}}
+                    </div>
+                    
+                    <div class="shipping-form-group">
+                        {{form.address1|as_crispy_field}}
+                    </div>
+                    
+                    <div class="shipping-form-group">
+                        {{form.address2|as_crispy_field}}
+                    </div>
+                    
+                    <div class="shipping-form-group">
+                        {{form.city|as_crispy_field}}
+                    </div>
+                    
+                    <div class="shipping-form-group">
+                        {{form.state|as_crispy_field}}
+                    </div>
+                    
+                    <div class="shipping-form-group">
+                        {{form.zipcode|as_crispy_field}}
+                    </div>
+                    
+                    <button type="submit" class="shipping-btn shipping-btn-primary">
+                        <i class="fa fa-map-marker"></i> Update Shipping Address
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+

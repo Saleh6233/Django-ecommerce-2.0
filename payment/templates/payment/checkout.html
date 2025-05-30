@@ -1,0 +1,448 @@
+{% extends "store/base.html" %}
+
+{% load static %}
+
+{% block css_files %}
+<style>
+  .checkout-page {
+    --checkout-primary: #4a6cf7;
+    --checkout-primary-hover: #3d5ee1;
+    --checkout-secondary: #6b7280;
+    --checkout-success: #10b981;
+    --checkout-danger: #ef4444;
+    --checkout-warning: #f59e0b;
+    --checkout-info: #3b82f6;
+    --checkout-light: #f9fafb;
+    --checkout-dark: #1f2937;
+    --checkout-body-bg: #f1f5f9;
+    --checkout-card-bg: #ffffff;
+    --checkout-border-color: #e2e8f0;
+    --checkout-text-main: #334155;
+    --checkout-text-muted: #64748b;
+    --checkout-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --checkout-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --checkout-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --checkout-radius: 0.5rem;
+    background-color: var(--checkout-body-bg);
+    color: var(--checkout-text-main);
+    padding: 1.5rem 0;
+  }
+
+  /* Page header - scoped */
+  .checkout-page .checkout-page-header {
+    margin-bottom: 1.5rem;
+  }
+
+  .checkout-page .checkout-page-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--checkout-dark);
+    margin-bottom: 0.5rem;
+  }
+
+  .checkout-page .checkout-path {
+    display: flex;
+    align-items: center;
+    font-size: 0.875rem;
+    color: var(--checkout-text-muted);
+  }
+
+  .checkout-page .checkout-path a {
+    color: var(--checkout-primary);
+    text-decoration: none;
+  }
+
+  .checkout-page .checkout-path-separator {
+    margin: 0 0.5rem;
+    color: var(--checkout-text-muted);
+  }
+
+  /* Checkout card - scoped */
+  .checkout-page .checkout-card {
+    background-color: var(--checkout-card-bg);
+    border-radius: var(--checkout-radius);
+    box-shadow: var(--checkout-shadow);
+    margin: 0 auto 1.5rem;
+    overflow: hidden;
+    max-width: 600px;
+  }
+
+  .checkout-page .checkout-card-header {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--checkout-border-color);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .checkout-page .checkout-card-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin: 0;
+    color: var(--checkout-dark);
+    display: flex;
+    align-items: center;
+  }
+
+  .checkout-page .checkout-card-title i {
+    margin-right: 0.5rem;
+    color: var(--checkout-primary);
+  }
+
+  .checkout-page .checkout-card-body {
+    padding: 1.5rem;
+  }
+
+  .checkout-page .checkout-card-subtitle {
+    font-size: 0.95rem;
+    color: var(--checkout-text-muted);
+    margin-bottom: 1.5rem;
+  }
+
+  /* Form fields - scoped */
+  .checkout-page .checkout-form-group {
+    margin-bottom: 1.25rem;
+  }
+
+  .checkout-page .checkout-form-group:last-child {
+    margin-bottom: 0;
+  }
+
+  .checkout-page .checkout-form-control {
+    display: block;
+    width: 100%;
+    padding: 0.75rem 1rem;
+    font-size: 0.95rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: var(--checkout-dark);
+    background-color: var(--checkout-light);
+    background-clip: padding-box;
+    border: 1px solid var(--checkout-border-color);
+    border-radius: var(--checkout-radius);
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+  }
+
+  .checkout-page .checkout-form-control:focus {
+    border-color: var(--checkout-primary);
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(74, 108, 247, 0.25);
+  }
+
+  .checkout-page .checkout-form-control::placeholder {
+    color: var(--checkout-text-muted);
+    opacity: 0.8;
+  }
+
+  /* Payment section - scoped */
+  .checkout-page .checkout-payment-section {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px dashed var(--checkout-border-color);
+  }
+
+  .checkout-page .checkout-payment-title {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: var(--checkout-dark);
+    text-align: center;
+  }
+
+  /* Responsive adjustment */
+  @media (max-width: 767px) {
+    .checkout-page .checkout-card {
+      max-width: 100%;
+    }
+  }
+
+  /* Loading Spinner Styles */
+  .checkout-page .spinner-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    visibility: hidden;
+    opacity: 0;
+    transition: visibility 0s, opacity 0.3s;
+  }
+
+  .checkout-page .spinner-overlay.active {
+    visibility: visible;
+    opacity: 1;
+  }
+
+  .checkout-page .spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid var(--checkout-primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+
+  @keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+  }
+
+  .checkout-page .spinner-message {
+    color: white;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 10px 20px;
+    border-radius: var(--checkout-radius);
+    margin-top: 15px;
+    font-size: 14px;
+    font-weight: 600;
+  }
+</style>
+{% endblock css_files %}
+
+{% block content %}
+<div class="checkout-page">
+  <div class="container">
+    <!-- Page Header -->
+    <div class="checkout-page-header">
+      <h1 class="checkout-page-title">Checkout</h1>
+      <div class="checkout-path">
+        <a href="{% url 'store' %}">Home</a>
+        <span class="checkout-path-separator">/</span>
+        <a href="{% url 'cart-summary' %}">Cart</a>
+        <span class="checkout-path-separator">/</span>
+        <span>Checkout</span>
+      </div>
+    </div>
+
+    <!-- Checkout Form Card -->
+    <div class="checkout-card">
+      <div class="checkout-card-header">
+        <h5 class="checkout-card-title">
+          <i class="fa fa-credit-card"></i> Complete Your Order
+        </h5>
+      </div>
+      <div class="checkout-card-body">
+        <p class="checkout-card-subtitle">Please enter your shipping information below to complete your purchase.</p>
+
+        <form id="form" onsubmit="event.preventDefault();">
+          <div class="checkout-form-group">
+            <input
+              class="checkout-form-control validate"
+              id="name"
+              type="text"
+              placeholder="Full name*"
+              autocomplete="off"
+              value="{{ shipping.full_name }}"
+              required
+            />
+          </div>
+
+          <div class="checkout-form-group">
+            <input
+              class="checkout-form-control validate"
+              id="email"
+              type="email"
+              placeholder="Email address*"
+              autocomplete="off"
+              value="{{ shipping.email }}"
+              required
+            />
+          </div>
+
+          <div class="checkout-form-group">
+            <input
+              class="checkout-form-control validate"
+              id="address1"
+              type="text"
+              placeholder="Address 1*"
+              autocomplete="off"
+              value="{{ shipping.address1 }}"
+              required
+            />
+          </div>
+
+          <div class="checkout-form-group">
+            <input
+              class="checkout-form-control validate"
+              id="address2"
+              type="text"
+              placeholder="Address 2*"
+              autocomplete="off"
+              value="{{ shipping.address2 }}"
+              required
+            />
+          </div>
+
+          <div class="checkout-form-group">
+            <input
+              class="checkout-form-control validate"
+              id="city"
+              type="text"
+              placeholder="City*"
+              autocomplete="off"
+              value="{{ shipping.city }}"
+              required
+            />
+          </div>
+
+          <div class="checkout-form-group">
+            <input
+              class="checkout-form-control"
+              id="state"
+              type="text"
+              placeholder="State (Optional)"
+              autocomplete="off"
+              value="{{ shipping.state }}"
+            />
+          </div>
+
+          <div class="checkout-form-group">
+            <input
+              class="checkout-form-control"
+              id="zipcode"
+              type="text"
+              placeholder="Zip code (Optional)"
+              autocomplete="off"
+              value="{{ shipping.zipcode }}"
+            />
+          </div>
+
+          <div class="checkout-payment-section">
+            <h6 class="checkout-payment-title">Select Payment Method</h6>
+            <div id="paypal-button-container"></div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading Spinner Overlay -->
+  <div class="spinner-overlay" id="loadingSpinner">
+    <div style="text-align: center;">
+      <div class="spinner"></div>
+      <div class="spinner-message">Processing your order...</div>
+    </div>
+  </div>
+</div>
+
+<script src="https://www.paypal.com/sdk/js?client-id=" data-sdk-integration-source="developer-studio"></script> <!-- Give your own client id in here-->
+
+<script>
+  // Using parseInt to parse the Django template variable to avoid linter errors
+  var total_price = parseInt("{{ cart.get_total }}");
+
+  // Helper function to show/hide loading spinner
+  function toggleSpinner(show) {
+    const spinner = document.getElementById('loadingSpinner');
+    if (show) {
+      spinner.classList.add('active');
+    } else {
+      spinner.classList.remove('active');
+    }
+  }
+
+  window.paypal.Buttons({
+      // Updated styling from new version
+      style: {
+          shape: "pill",
+          layout: "vertical",
+          color: "silver",
+          label: "paypal",
+      },
+
+      onInit: function(data, actions) {
+          actions.disable();
+
+          // Consolidate validation logic (removing duplicate code)
+          document.querySelectorAll('.validate').forEach(item => {
+              item.addEventListener('keyup', validateForm);
+          });
+
+          // Initial validation check
+          validateForm();
+
+          // Form validation function
+          function validateForm() {
+              var order_verified = 'Yes';
+
+              $(':input[required]').each(function() {
+                  if($(this).val() == '') {
+                      order_verified = 'No';
+                      return false; // Break the loop early
+                  }
+              });
+
+              if(order_verified === 'Yes') {
+                  actions.enable();
+              } else {
+                  actions.disable();
+              }
+          }
+      },
+
+      // Create the order with Django backend integration
+      createOrder: function(data, actions) {
+          return actions.order.create({
+              purchase_units: [
+                  {
+                      amount: {
+                          value: total_price
+                      }
+                  }
+              ]
+          });
+      },
+
+      // Handle successful transactions with Django backend
+      onApprove: function(data, actions) {
+          // Show loading spinner while processing
+          toggleSpinner(true);
+
+          return actions.order.capture().then(function(details) {
+              console.log('Transaction completed');
+
+              $.ajax({
+                  type: 'POST',
+                  url: '{% url "complete-order" %}',
+                  data: {
+                      name: $('#name').val(),
+                      email: $('#email').val(),
+                      address1: $('#address1').val(),
+                      address2: $('#address2').val(),
+                      city: $('#city').val(),
+                      state: $('#state').val(),
+                      zipcode: $('#zipcode').val(),
+                      csrfmiddlewaretoken: "{{csrf_token}}",
+                      action: 'post',
+                      transaction_id: details.id,
+                      status: details.status
+                  },
+                  success: function(json) {
+                      window.location.replace("{% url 'payment-success' %}");
+                  },
+                  error: function(xhr, errmsg, err) {
+                      toggleSpinner(false);
+                      window.location.replace("{% url 'payment-failed' %}");
+                  }
+              });
+          }).catch(function(error) {
+              toggleSpinner(false);
+              console.error('PayPal capture error:', error);
+              window.location.replace("{% url 'payment-failed' %}");
+          });
+      },
+
+      // Enhanced error handling from new version
+      onError: function(err) {
+          toggleSpinner(false);
+          console.error('An error prevented the buyer from checking out with PayPal');
+          console.error(err);
+      }
+  }).render("#paypal-button-container");
+</script>
+{% endblock content %}

@@ -1,0 +1,241 @@
+{% extends "store/base.html" %}
+
+{% load static %}
+
+{% load crispy_forms_tags %}
+
+
+{% block content %}
+
+<style>
+    /* Scoped variables - won't affect global styles */
+    .profile-page {
+        --profile-primary: #4a6cf7;
+        --profile-primary-hover: #3d5ee1;
+        --profile-secondary: #6b7280;
+        --profile-success: #10b981;
+        --profile-danger: #ef4444;
+        --profile-warning: #f59e0b;
+        --profile-info: #3b82f6;
+        --profile-light: #f9fafb;
+        --profile-dark: #1f2937;
+        --profile-body-bg: #f1f5f9;
+        --profile-card-bg: #ffffff;
+        --profile-border-color: #e2e8f0;
+        --profile-text-main: #334155;
+        --profile-text-muted: #64748b;
+        --profile-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        --profile-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        --profile-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        --profile-radius: 0.5rem;
+        background-color: var(--profile-body-bg);
+        color: var(--profile-text-main);
+        padding: 1.5rem 0;
+    }
+
+    /* Page header - scoped */
+    .profile-page .profile-page-header {
+        margin-bottom: 1.5rem;
+    }
+
+    .profile-page .profile-page-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--profile-dark);
+        margin-bottom: 0.5rem;
+    }
+
+    .profile-page .profile-path {
+        display: flex;
+        align-items: center;
+        font-size: 0.875rem;
+        color: var(--profile-text-muted);
+    }
+
+    .profile-page .profile-path a {
+        color: var(--profile-primary);
+        text-decoration: none;
+    }
+
+    .profile-page .profile-path-separator {
+        margin: 0 0.5rem;
+        color: var(--profile-text-muted);
+    }
+
+    /* Cards - scoped */
+    .profile-page .profile-card {
+        background-color: var(--profile-card-bg);
+        border-radius: var(--profile-radius);
+        box-shadow: var(--profile-shadow);
+        margin-bottom: 1.5rem;
+        overflow: hidden;
+    }
+
+    .profile-page .profile-card:last-child {
+        margin-bottom: 0;
+    }
+
+    .profile-page .profile-card-header {
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid var(--profile-border-color);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .profile-page .profile-card-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        margin: 0;
+        color: var(--profile-dark);
+        display: flex;
+        align-items: center;
+    }
+
+    .profile-page .profile-card-title i {
+        margin-right: 0.5rem;
+        color: var(--profile-primary);
+    }
+
+    .profile-page .profile-card-body {
+        padding: 1.5rem;
+    }
+
+    .profile-page .profile-card-subtitle {
+        font-size: 0.95rem;
+        color: var(--profile-text-muted);
+        margin-bottom: 1rem;
+    }
+
+    /* Forms - scoped */
+    .profile-page .profile-form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .profile-page .profile-form-group:last-child {
+        margin-bottom: 0;
+    }
+
+    /* Buttons - scoped */
+    .profile-page .profile-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.75rem 1.5rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        border-radius: var(--profile-radius);
+        cursor: pointer;
+        transition: all 0.2s;
+        border: none;
+        text-decoration: none;
+    }
+
+    .profile-page .profile-btn-primary {
+        background-color: var(--profile-primary);
+        color: white;
+    }
+
+    .profile-page .profile-btn-primary:hover {
+        background-color: var(--profile-primary-hover);
+    }
+
+    .profile-page .profile-btn-danger {
+        background-color: var(--profile-danger);
+        color: white;
+    }
+
+    .profile-page .profile-btn-danger:hover {
+        background-color: #dc2626;
+    }
+
+    .profile-page .profile-btn i {
+        margin-right: 0.5rem;
+    }
+</style>
+
+<div class="profile-page">
+    <div class="container">
+        <!-- Page Header -->
+        <div class="profile-page-header">
+            <h1 class="profile-page-title">Profile Management</h1>
+            <div class="profile-path">
+                <a href="{% url 'store' %}">Home</a>
+                <span class="profile-path-separator">/</span>
+                <a href="{% url 'dashboard' %}">Dashboard</a>
+                <span class="profile-path-separator">/</span>
+                <span>Profile Management</span>
+            </div>
+        </div>
+        
+        <!-- Overview Card -->
+        <div class="profile-card">
+            <div class="profile-card-header">
+                <h5 class="profile-card-title">
+                    <i class="fa fa-address-book"></i> Account Overview
+                </h5>
+            </div>
+            <div class="profile-card-body">
+                <p class="profile-card-subtitle">Manage your account information and settings effectively.</p>
+            </div>
+        </div>
+        
+        <!-- Update Account Card -->
+        <div class="profile-card">
+            <div class="profile-card-header">
+                <h5 class="profile-card-title">
+                    <i class="fa fa-user-circle"></i> Update Your Account
+                </h5>
+            </div>
+            <div class="profile-card-body">
+                <p class="profile-card-subtitle">Update your account information below.</p>
+                
+                <form method="POST" autocomplete="off">
+                    {% csrf_token %}
+                    
+                    <div class="profile-form-group">
+                        {{user_form.username|as_crispy_field}}
+                    </div>
+                    
+                    <div class="profile-form-group">
+                        {{user_form.email|as_crispy_field}}
+                    </div>
+                    
+                    <button type="submit" class="profile-btn profile-btn-primary">
+                        <i class="fa fa-save"></i> Update Account
+                    </button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Delete Account Card -->
+        <div class="profile-card">
+            <div class="profile-card-header">
+                <h5 class="profile-card-title">
+                    <i class="fa fa-exclamation-triangle"></i> Delete Your Account
+                </h5>
+            </div>
+            <div class="profile-card-body">
+                <p class="profile-card-subtitle">Permanently delete your account and all associated data. This action cannot be undone.</p>
+                
+                <a href="{% url 'delete-account' %}" class="profile-btn profile-btn-danger">
+                    <i class="fa fa-trash"></i> Delete Account
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,205 @@
+{% extends "store/base.html" %}
+
+<!-- ******this is comment -->
+{% load static %}
+
+<!-- ******this is comment -->
+{% block css_files %}
+
+<!-- ******this is comment -->
+
+<!-- ******this is comment -->
+{% endblock css_files %}
+
+<!-- ******this is comment -->
+{% block content %}
+<style>
+  
+  .payment-success-page {
+      --payment-success-primary: #4a6cf7;
+      --payment-success-primary-hover: #3d5ee1;
+      --payment-success-secondary: #6b7280;
+      --payment-success-success: #10b981;
+      --payment-success-danger: #ef4444;
+      --payment-success-warning: #f59e0b;
+      --payment-success-info: #3b82f6;
+      --payment-success-light: #f9fafb;
+      --payment-success-dark: #1f2937;
+      --payment-success-body-bg: #f1f5f9;
+      --payment-success-card-bg: #ffffff;
+      --payment-success-border-color: #e2e8f0;
+      --payment-success-text-main: #334155;
+      --payment-success-text-muted: #64748b;
+      --payment-success-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --payment-success-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      --payment-success-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+      --payment-success-radius: 0.5rem;
+      background-color: var(--payment-success-body-bg);
+      color: var(--payment-success-text-main);
+      padding: 1.5rem 0;
+  }
+
+  /* Page header - scoped */
+  .payment-success-page .payment-success-page-header {
+      margin-bottom: 1.5rem;
+  }
+
+  .payment-success-page .payment-success-page-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--payment-success-dark);
+      margin-bottom: 0.5rem;
+      text-align: center;
+  }
+
+  /* Success card - scoped */
+  .payment-success-page .payment-success-card {
+      background-color: var(--payment-success-card-bg);
+      border-radius: var(--payment-success-radius);
+      box-shadow: var(--payment-success-shadow);
+      margin: 0 auto 1.5rem;
+      overflow: hidden;
+      max-width: 500px;
+  }
+
+  .payment-success-page .payment-success-card-header {
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid var(--payment-success-border-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: rgba(16, 185, 129, 0.05);
+  }
+
+  .payment-success-page .payment-success-icon {
+      width: 80px;
+      height: 80px;
+      background-color: rgba(16, 185, 129, 0.1);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--payment-success-success);
+      font-size: 2.5rem;
+      margin: 0 auto;
+  }
+
+  .payment-success-page .payment-success-card-body {
+      padding: 2rem 1.5rem;
+      text-align: center;
+  }
+
+  .payment-success-page .payment-success-title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--payment-success-dark);
+      margin-bottom: 1rem;
+  }
+
+  .payment-success-page .payment-success-message {
+      font-size: 1rem;
+      color: var(--payment-success-text-muted);
+      margin-bottom: 2rem;
+      line-height: 1.6;
+  }
+
+  .payment-success-page .payment-success-order-number {
+      font-weight: 600;
+      color: var(--payment-success-dark);
+  }
+
+  .payment-success-page .payment-success-actions {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+      margin-top: 2rem;
+  }
+
+  .payment-success-page .payment-success-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.75rem 1.5rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      border-radius: var(--payment-success-radius);
+      cursor: pointer;
+      transition: all 0.2s;
+      border: none;
+      text-decoration: none;
+  }
+
+  .payment-success-page .payment-success-btn-primary {
+      background-color: var(--payment-success-primary);
+      color: white;
+  }
+
+  .payment-success-page .payment-success-btn-primary:hover {
+      background-color: var(--payment-success-primary-hover);
+  }
+
+  .payment-success-page .payment-success-btn-success {
+      background-color: var(--payment-success-success);
+      color: white;
+  }
+
+  .payment-success-page .payment-success-btn-success:hover {
+      background-color: #0ea571; /* Slightly darker green */
+  }
+
+  .payment-success-page .payment-success-btn i {
+      margin-right: 0.5rem;
+  }
+
+  /* Responsive adjustment */
+  @media (max-width: 767px) {
+      .payment-success-page .payment-success-card {
+          max-width: 100%;
+      }
+      
+      .payment-success-page .payment-success-actions {
+          flex-direction: column;
+      }
+      
+      .payment-success-page .payment-success-btn {
+          width: 100%;
+      }
+  }
+</style>
+
+<div class="payment-success-page">
+  <div class="container">
+      <!-- Page Header -->
+      <div class="payment-success-page-header">
+          <h1 class="payment-success-page-title">Payment Successful</h1>
+      </div>
+
+      <!-- Success Card -->
+      <div class="payment-success-card">
+          <div class="payment-success-card-header">
+              <div class="payment-success-icon">
+                  <i class="fa fa-check"></i>
+              </div>
+          </div>
+          <div class="payment-success-card-body">
+              <h2 class="payment-success-title">Thank You for Your Order!</h2>
+              
+              <p class="payment-success-message">
+                  Your payment was processed successfully. We've received your order and are preparing it for shipment.
+                  You will receive a confirmation email shortly with your order details.
+              </p>
+              
+              <div class="payment-success-actions">
+                  <a href="{% url 'store' %}" class="payment-success-btn payment-success-btn-primary">
+                      <i class="fa fa-shopping-bag"></i> Continue Shopping
+                  </a>
+                  <a href="{% url 'track-orders' %}" class="payment-success-btn payment-success-btn-success">
+                      <i class="fa fa-truck"></i> Track Your Order
+                  </a>
+              </div>
+          </div>
+      </div>
+  </div>
+</div>
+
+{% endblock %}

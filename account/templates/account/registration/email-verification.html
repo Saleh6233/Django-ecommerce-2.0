@@ -1,0 +1,13 @@
+{% autoescape off %}
+	Assalamu Alaikum brother/sister,
+
+    Jazakallah for registering our website. Please verify your email by clicking the link below:
+
+    http://{{ domain }}{% url 'email-verification'  uidb64=uid token=token %}
+
+{% endautoescape %}
+
+
+
+
+

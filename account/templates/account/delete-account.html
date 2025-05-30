@@ -1,0 +1,236 @@
+{% extends "store/base.html" %}
+
+{% load static %}
+
+{% load crispy_forms_tags %}
+
+
+{% block content %}
+
+<style>
+    /* Scoped variables - won't affect global styles */
+    .delete-page {
+        --delete-primary: #4a6cf7;
+        --delete-primary-hover: #3d5ee1;
+        --delete-secondary: #6b7280;
+        --delete-success: #10b981;
+        --delete-danger: #ef4444;
+        --delete-danger-hover: #dc2626;
+        --delete-warning: #f59e0b;
+        --delete-info: #3b82f6;
+        --delete-light: #f9fafb;
+        --delete-dark: #1f2937;
+        --delete-body-bg: #f1f5f9;
+        --delete-card-bg: #ffffff;
+        --delete-border-color: #e2e8f0;
+        --delete-text-main: #334155;
+        --delete-text-muted: #64748b;
+        --delete-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        --delete-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        --delete-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        --delete-radius: 0.5rem;
+        background-color: var(--delete-body-bg);
+        color: var(--delete-text-main);
+        padding: 1.5rem 0;
+    }
+
+    /* Page header - scoped */
+    .delete-page .delete-page-header {
+        margin-bottom: 1.5rem;
+    }
+
+    .delete-page .delete-page-title {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--delete-dark);
+        margin-bottom: 0.5rem;
+    }
+
+    .delete-page .delete-path {
+        display: flex;
+        align-items: center;
+        font-size: 0.875rem;
+        color: var(--delete-text-muted);
+    }
+
+    .delete-page .delete-path a {
+        color: var(--delete-primary);
+        text-decoration: none;
+    }
+
+    .delete-page .delete-path-separator {
+        margin: 0 0.5rem;
+        color: var(--delete-text-muted);
+    }
+
+    /* Confirmation card - scoped */
+    .delete-page .delete-card {
+        background-color: var(--delete-card-bg);
+        border-radius: var(--delete-radius);
+        box-shadow: var(--delete-shadow);
+        margin-bottom: 1.5rem;
+        overflow: hidden;
+    }
+
+    .delete-page .delete-card-header {
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid var(--delete-border-color);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background-color: rgba(239, 68, 68, 0.05);
+    }
+
+    .delete-page .delete-card-title {
+        font-size: 1.125rem;
+        font-weight: 600;
+        margin: 0;
+        color: var(--delete-danger);
+        display: flex;
+        align-items: center;
+    }
+
+    .delete-page .delete-card-title i {
+        margin-right: 0.5rem;
+    }
+
+    .delete-page .delete-card-body {
+        padding: 2rem 1.5rem;
+    }
+
+    .delete-page .delete-warning-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 70px;
+        height: 70px;
+        background-color: rgba(239, 68, 68, 0.1);
+        border-radius: 50%;
+        margin: 0 auto 1.5rem;
+        color: var(--delete-danger);
+        font-size: 2rem;
+    }
+
+    .delete-page .delete-warning-text {
+        text-align: center;
+        font-size: 1.125rem;
+        margin-bottom: 2rem;
+        max-width: 500px;
+        margin-left: auto;
+        margin-right: auto;
+        color: var(--delete-text-main);
+    }
+
+    .delete-page .delete-description {
+        text-align: center;
+        color: var(--delete-text-muted);
+        margin-bottom: 2rem;
+        max-width: 500px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    /* Button container - scoped */
+    .delete-page .delete-actions {
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        flex-wrap: wrap;
+    }
+
+    /* Buttons - scoped */
+    .delete-page .delete-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.75rem 1.5rem;
+        font-size: 0.875rem;
+        font-weight: 500;
+        border-radius: var(--delete-radius);
+        cursor: pointer;
+        transition: all 0.2s;
+        border: none;
+        text-decoration: none;
+    }
+
+    .delete-page .delete-btn-primary {
+        background-color: var(--delete-primary);
+        color: white;
+    }
+
+    .delete-page .delete-btn-primary:hover {
+        background-color: var(--delete-primary-hover);
+    }
+
+    .delete-page .delete-btn-danger {
+        background-color: var(--delete-danger);
+        color: white;
+    }
+
+    .delete-page .delete-btn-danger:hover {
+        background-color: var(--delete-danger-hover);
+    }
+
+    .delete-page .delete-btn i {
+        margin-right: 0.5rem;
+    }
+</style>
+
+<div class="delete-page">
+    <div class="container">
+        <!-- Page Header -->
+        <div class="delete-page-header">
+            <h1 class="delete-page-title">Account Deletion</h1>
+            <div class="delete-path">
+                <a href="{% url 'store' %}">Home</a>
+                <span class="delete-path-separator">/</span>
+                <a href="#">Dashboard</a>
+                <span class="delete-path-separator">/</span>
+                <a href="{% url 'profile-management' %}">Profile Management</a>
+                <span class="delete-path-separator">/</span>
+                <span>Delete Account</span>
+            </div>
+        </div>
+        
+        <!-- Confirmation Card -->
+        <div class="delete-card">
+            <div class="delete-card-header">
+                <h5 class="delete-card-title">
+                    <i class="fa fa-exclamation-triangle"></i> Confirm Account Deletion
+                </h5>
+            </div>
+            <div class="delete-card-body">
+                <div class="delete-warning-icon">
+                    <i class="fa fa-exclamation-triangle"></i>
+                </div>
+                
+                <h4 class="delete-warning-text">Are you sure you want to delete your account?</h4>
+                
+                <p class="delete-description">
+                    This action will permanently delete your account and all associated data. 
+                    This operation cannot be undone, and you will lose access to your order history, saved addresses, and other account information.
+                </p>
+                
+                <form method="POST" autocomplete="off">
+                    {% csrf_token %}
+                    
+                    <div class="delete-actions">
+                        <a href="{% url 'profile-management' %}" class="delete-btn delete-btn-primary">
+                            <i class="fa fa-arrow-left"></i> Go Back
+                        </a>
+                        <button type="submit" class="delete-btn delete-btn-danger">
+                            <i class="fa fa-trash"></i> Delete Account
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+
+
+
+

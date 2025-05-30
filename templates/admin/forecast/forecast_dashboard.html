@@ -1,0 +1,233 @@
+{% extends "admin/base_site.html" %}
+
+{% load forecast_filters %}
+
+{% block extrastyle %}
+  {{ block.super }}
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+  <style>
+    /* Custom styles here can complement Bootstrap defaults */
+    .forecast-container {
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    .chart-container {
+        height: 400px;
+    }
+    .summary-box {
+        padding: 15px;
+        background-color: #f8f8f8;
+        border-radius: 5px;
+        margin-bottom: 20px;
+    }
+    .color-box {
+        width: 15px;
+        height: 15px;
+        margin-right: 5px;
+        display: inline-block;
+    }
+  </style>
+{% endblock %}
+
+{% block extrahead %}
+  {{ block.super }}
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="forecast-container container-fluid my-4">
+    <h1 class="dashboard-title">
+        <i class="fas fa-chart-line me-2"></i> Sales Forecast Dashboard
+    </h1>
+
+
+    <!-- Forecast Form -->
+    <div class="form-container">
+        <form method="post">
+            {% csrf_token %}
+            <div style="display: flex; align-items: center;">
+                <div style="margin-right: 20px;">
+                    <label for="id_forecast_period">Forecast Period:</label>
+                    <select name="forecast_period" id="id_forecast_period" class="form-control">
+                        {% for value, label in forecast_periods %}
+                            <option value="{{ value }}" {% if value == forecast_period %}selected{% endif %}>{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-sync-alt me-2"></i> Update Forecast
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Legend -->
+    <div class="legend d-flex justify-content-center mb-4">
+        {% for category in forecast_data.categories %}
+            <div class="d-flex align-items-center me-3">
+                <div class="color-box" style="background-color: {% if category == 'Shoes' %}rgba(54, 162, 235, 1){% elif category == 'Panjabi' %}rgba(255, 99, 132, 1){% else %}rgba(75, 192, 192, 1){% endif %};"></div>
+                <span>{{ category }}</span>
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- Charts Row -->
+    <div class="chart-row row mb-4">
+        <div class="line-chart col-lg-8 mb-4 mb-lg-0">
+            <div class="position-relative" style="height: 400px;">
+                <canvas id="forecastChart"></canvas>
+            </div>
+        </div>
+        <div class="pie-chart col-lg-4">
+            <div class="position-relative" style="height: 400px;">
+                <canvas id="salesPieChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Summary Section -->
+    <div class="summary-container row text-center">
+        {% for i in forecast_data.pie_labels|length|get_range %}
+            <div class="summary-box col-md-4">
+                <h3>{{ forecast_data.pie_labels|get_item:i }}</h3>
+                <p><strong>Forecasted Sales:</strong> {{ forecast_data.pie_values|get_item:i }}</p>
+                <p><strong>Percentage:</strong> {{ forecast_data.pie_percentages|get_item:i }}%</p>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Line Chart Setup
+    const lineCtx = document.getElementById('forecastChart').getContext('2d');
+    const forecastDates = {{ forecast_data.dates|safe }};
+    const shoeValues = {{ forecast_data.shoe_values|safe }};
+    const panjabiValues = {{ forecast_data.panjabi_values|safe }};
+    const attarValues = {{ forecast_data.attar_values|safe }};
+
+    const forecastChart = new Chart(lineCtx, {
+        type: 'line',
+        data: {
+            labels: forecastDates,
+            datasets: [
+                {
+                    label: 'Shoes',
+                    data: shoeValues,
+                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                    borderColor: 'rgba(54, 162, 235, 1)',
+                    borderWidth: 2,
+                    tension: 0.3,
+                    pointRadius: 2
+                },
+                {
+                    label: 'Panjabi',
+                    data: panjabiValues,
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 2,
+                    tension: 0.3,
+                    pointRadius: 2
+                },
+                {
+                    label: 'Attar',
+                    data: attarValues,
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 2,
+                    tension: 0.3,
+                    pointRadius: 2
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: false,
+                    title: {
+                        display: true,
+                        text: 'Sales Units'
+                    }
+                },
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Date'
+                    }
+                }
+            },
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Sales Forecast for Next ' + {{ forecast_period }} + ' Days',
+                    font: { size: 16 }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return context.dataset.label + ': ' + context.parsed.y.toFixed(0) + ' units';
+                        }
+                    }
+                },
+                legend: { display: false }
+            }
+        }
+    });
+
+    // Pie Chart Setup
+    const pieCtx = document.getElementById('salesPieChart').getContext('2d');
+    const pieLabels = {{ forecast_data.pie_labels|safe }};
+    const pieValues = {{ forecast_data.pie_values|safe }};
+    const piePercentages = {{ forecast_data.pie_percentages|safe }};
+
+    const pieChart = new Chart(pieCtx, {
+        type: 'pie',
+        data: {
+            labels: pieLabels,
+            datasets: [{
+                data: pieValues,
+                backgroundColor: [
+                    'rgba(54, 162, 235, 0.8)',
+                    'rgba(255, 99, 132, 0.8)',
+                    'rgba(75, 192, 192, 0.8)'
+                ],
+                borderColor: [
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(75, 192, 192, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Sales Distribution by Category',
+                    font: { size: 16 }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            const label = context.label || '';
+                            const value = context.raw || 0;
+                            const percentage = piePercentages[context.dataIndex];
+                            return label + ': ' + value + ' units (' + percentage + '%)';
+                        }
+                    }
+                }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

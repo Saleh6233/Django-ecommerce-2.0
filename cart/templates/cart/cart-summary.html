@@ -1,0 +1,364 @@
+{% extends "store/base.html" %}
+{% load static %}
+{% load mathfilters %}
+
+{% block css_files %}
+  <style>
+    /* Disabled button styling */
+    .quantity-increase:disabled,
+    .quantity-decrease:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      background-color: #f8f9fa;
+      border-color: #dee2e6;
+    }
+
+    /* Hover state for enabled buttons */
+    .quantity-increase:not(:disabled):hover,
+    .quantity-decrease:not(:disabled):hover {
+      background-color: #e9ecef;
+      border-color: #ced4da;
+    }
+
+    /* Disabled input styling */
+    input[type="number"]:read-only {
+      background-color: #f8f9fa;
+      cursor: not-allowed;
+    }
+
+    /* Current item stock warning */
+    .stock-warning {
+      color: #dc3545;
+      font-size: 0.9rem;
+      display: block;
+      margin-top: 0.25rem;
+    }
+  </style>
+{% endblock css_files %}
+
+{% block content %}
+<main class="py-5">
+  <div class="container">
+    <div class="row">
+      <!-- Cart Items Section -->
+      <div class="col-lg-8">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+          <h1 class="h4 mb-0">
+            Shopping Cart
+            <span class="text-muted fs-6">({{ cart|length }} items)</span>
+          </h1>
+          <a href="{% url 'store' %}" class="text-decoration-none">
+            <i class="fa fa-arrow-left me-2"></i>Continue Shopping
+          </a>
+        </div>
+
+        {% if cart|length == 0 %}
+          <div class="text-center py-5 my-4 border rounded bg-light">
+            <i class="fa fa-shopping-cart fa-3x text-muted mb-3"></i>
+            <h2 class="h5 text-muted">Your cart is empty</h2>
+            <p class="mb-4">
+              Looks like you haven't added anything to your cart yet.
+            </p>
+            <a href="{% url 'store' %}" class="btn btn-primary">Browse Products</a>
+          </div>
+        {% else %}
+          <div class="card shadow-sm mb-4">
+            <div class="card-body p-0">
+              {% for item in cart %}
+                {% with product=item.product %}
+                  <div class="cart-item p-3 {% if not forloop.last %}border-bottom{% endif %}">
+                    <div class="row align-items-center">
+                      <!-- Product Image -->
+                      <div class="col-3 col-md-2">
+                        <a href="{{ product.get_absolute_url }}">
+                          <img src="{{ product.image.url }}" class="img-fluid rounded" alt="{{ product.title }}" />
+                        </a>
+                      </div>
+                      <!-- Product Details -->
+                      <div class="col-9 col-md-10">
+                        <div class="row align-items-center">
+                          <div class="col-md-5">
+                            <a href="{{ product.get_absolute_url }}" class="text-decoration-none text-reset">
+                              <h2 class="h6 mb-1">{{ product.title }}</h2>
+                            </a>
+                            {% if product.category %}
+                              <span class="badge bg-light text-dark mt-1">{{ product.category }}</span>
+                            {% endif %}
+                          </div>
+                          <!-- Quantity Selector -->
+                          <div class="col-md-3 mt-3 mt-md-0">
+                            <div class="input-group input-group-sm quantity-selector">
+                              <!-- Decrease Button -->
+                              <button type="button"
+                                      class="btn btn-outline-secondary quantity-decrease"
+                                      data-product-id="{{ product.id }}"
+                                      {% if item.qty <= 1 %}disabled{% endif %}>
+                                <i class="fa fa-minus"></i>
+                              </button>
+                              <!-- Quantity Input (read-only) -->
+                              <input
+                                    type="number"
+                                    id="quantity{{ product.id }}"
+                                    class="form-control text-center"
+                                    value="{{ item.qty }}"
+                                    min="1"
+                                    max="{{ product.quantity }}"
+                                    readonly
+                                />
+                              <!-- Increase Button -->
+                                    <button
+                                    type="button"
+                                    class="btn btn-outline-secondary quantity-increase"
+                                    data-product-id="{{ product.id }}"
+                                    {% if item.qty >= product.quantity %}disabled{% endif %}>
+                                    <i class="fa fa-plus"></i>
+                                    </button>
+                            </div>
+                            <!-- Stock Warning Message -->
+                            <div id="stockWarning{{ product.id }}"
+                                 class="stock-warning"
+                                 {% if item.qty < product.quantity %}hidden{% endif %}>
+                              Maximum available in stock
+                            </div>
+                            <!-- Update Button -->
+                            <button type="button"
+                                    data-index="{{ product.id }}"
+                                    class="btn btn-sm text-primary update-button mt-2 w-100">
+                              Update
+                            </button>
+                          </div>
+                          <!-- Price per Item -->
+                          <div class="col-md-2 text-md-end mt-3 mt-md-0">
+                            <span class="h6 fw-bold">${{ product.price }}</span>
+                            <div class="text-muted small">per item</div>
+                          </div>
+                          <!-- Subtotal & Remove -->
+                          <div class="col-md-2 text-md-end mt-3 mt-md-0">
+                            <div class="h6 fw-bold" data-product-subtotal="{{ product.id }}">
+                              ${{ product.price|mul:item.qty }}
+                            </div>
+                            <button type="button"
+                                    data-index="{{ product.id }}"
+                                    class="btn btn-sm text-danger delete-button p-0">
+                              <i class="fa fa-trash-alt me-1"></i>Remove
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                {% endwith %}
+              {% endfor %}
+            </div>
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Order Summary Section -->
+      <div class="col-lg-4">
+        <div class="card shadow-sm">
+          <div class="card-header bg-white">
+            <h2 class="h5 mb-0">Order Summary</h2>
+          </div>
+          <div class="card-body">
+            <div class="d-flex justify-content-between mb-2">
+              <span>Subtotal</span>
+              <span class="fw-bold subtotal-value">${{ cart.get_total }}</span>
+            </div>
+            <div class="d-flex justify-content-between mb-2">
+              <span>Shipping</span>
+              <span class="fw-bold">$0.00</span>
+            </div>
+            <div class="d-flex justify-content-between mb-2">
+              <span>Tax</span>
+              <span class="fw-bold">$0.00</span>
+            </div>
+            <hr />
+            <div class="d-flex justify-content-between mb-3">
+              <span class="h6 fw-bold">Total</span>
+              <span class="h5 fw-bold" id="total">${{ cart.get_total }}</span>
+            </div>
+            <!-- Checkout Button -->
+            <a href="{% url 'checkout' %}" class="btn btn-primary w-100 py-2 fw-bold">
+              <i class="fa fa-lock me-2"></i>Proceed to Checkout
+            </a>
+            <!-- Payment Methods -->
+            <div class="text-center mt-3">
+              <span class="text-muted small">We Accept</span>
+              <div class="mt-2">
+                <i class="fa fa-cc-visa mx-1 fs-4"></i>
+                <i class="fa fa-cc-mastercard mx-1 fs-4"></i>
+                <i class="fa fa-cc-amex mx-1 fs-4"></i>
+                <i class="fa fa-cc-paypal mx-1 fs-4"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Shipping & Return Info -->
+        <div class="card mt-3 shadow-sm">
+          <div class="card-body">
+            <div class="d-flex align-items-center mb-3">
+              <i class="fa fa-truck text-primary me-3 fs-4"></i>
+              <div>
+                <h3 class="h6 mb-0">Free Shipping</h3>
+                <small class="text-muted">For orders over $50</small>
+              </div>
+            </div>
+            <div class="d-flex align-items-center">
+              <i class="fa fa-exchange-alt text-primary me-3 fs-4"></i>
+              <div>
+                <h3 class="h6 mb-0">Easy Returns</h3>
+                <small class="text-muted">30 day return policy</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Additional sections like "You May Also Like" can go here -->
+  </div>
+</main>
+
+<script>
+  $(document).ready(function () {
+    // Delete Button Handler
+    $(document).on("click", ".delete-button", function (e) {
+      e.preventDefault();
+      const productId = $(this).data("index");
+
+      if (confirm("Are you sure you want to remove this item?")) {
+        $.ajax({
+          type: "POST",
+          url: '{% url "cart-delete" %}',
+          data: {
+            product_id: productId,
+            csrfmiddlewaretoken: "{{ csrf_token }}",
+            action: "post",
+          },
+          success: function (json) {
+            location.reload();
+            $("#cart-qty").text(json.qty);
+            $("#total").text("$" + json.total);
+          },
+          error: function (xhr, errmsg, err) {
+            console.error("Error removing item:", err);
+          },
+        });
+      }
+    });
+
+    // Update Button Handler
+    $(document).on("click", ".update-button", function (e) {
+      e.preventDefault();
+      const productId = $(this).data("index");
+      const quantityInput = $("#quantity" + productId);
+      const newVal = parseInt(quantityInput.val());
+      const previousVal = parseInt(quantityInput.attr("value")); // Store previous value
+
+      $.ajax({
+        type: "POST",
+        url: '{% url "cart-update" %}',
+        data: {
+          product_id: productId,
+          product_quantity: newVal,
+          csrfmiddlewaretoken: "{{ csrf_token }}",
+          action: "post",
+        },
+        success: function (json) {
+              if (json.success) {
+                // Update cart totals
+                $('#cart-qty').text(json.qty);
+                $('#total').text('$' + json.total);
+                $('.subtotal-value').text('$' + json.total);
+
+                // Update specific product controls
+                const quantityInput = $('#quantity' + productId);
+                const increaseBtn = $('.quantity-increase[data-product-id="' + productId + '"]');
+                const decreaseBtn = $('.quantity-decrease[data-product-id="' + productId + '"]');
+                const stockWarning = $('#stockWarning' + productId);
+
+                // Update quantity and set max
+                quantityInput.val(json.new_qty);
+                quantityInput.attr('max', json.product_quantity);
+
+                // Update subtotal for that item
+                $(`[data-product-subtotal="${productId}"]`).text(
+                  "$" + (json.new_qty * parseFloat(json.product_price)).toFixed(2)
+                );
+
+                // Toggle button states and warnings
+                increaseBtn.prop('disabled', json.new_qty >= json.product_quantity);
+                decreaseBtn.prop('disabled', json.new_qty <= 1);
+
+                // Show/hide stock warning
+                if (json.new_qty >= json.product_quantity) {
+                  stockWarning.removeAttr('hidden');
+                } else {
+                  stockWarning.attr('hidden', true);
+                }
+              } else {
+                // Handle error from backend
+                alert(json.message);
+                quantityInput.val(previousVal);  // Revert if failed
+              }
+            },
+
+        error: function (xhr, errmsg, err) {
+          console.error("Error updating cart:", err);
+          quantityInput.val(previousVal);
+          alert("Error updating cart. Please try again.");
+        },
+      });
+    });
+
+     // Quantity Increase Handler
+  $(document).on("click", ".quantity-increase", function () {
+    const productId = $(this).data("product-id");
+    const quantityInput = $("#quantity" + productId);
+    const stockWarning = $("#stockWarning" + productId);
+    const max = parseInt(quantityInput.attr('max'));
+    let currentVal = parseInt(quantityInput.val());
+
+    if (currentVal < max) {
+      // Increase the value
+      quantityInput.val(currentVal + 1);
+
+      // Enable decrease button
+      $(this).siblings('.quantity-decrease').prop('disabled', false);
+
+      // Check if we reached max after increasing
+      if (currentVal + 1 >= max) {
+        $(this).prop('disabled', true);
+        stockWarning.removeAttr('hidden');
+      }
+    }
+  });
+
+  // Quantity Decrease Handler
+  $(document).on("click", ".quantity-decrease", function () {
+    const productId = $(this).data("product-id");
+    const quantityInput = $("#quantity" + productId);
+    const stockWarning = $("#stockWarning" + productId);
+    let currentVal = parseInt(quantityInput.val());
+
+    if (currentVal > 1) {
+      // Decrease the value
+      quantityInput.val(currentVal - 1);
+
+      // Always enable increase button when decreasing
+      $(this).siblings('.quantity-increase').prop('disabled', false);
+
+      // Hide stock warning
+      stockWarning.attr('hidden', true);
+
+      // Disable decrease if we reach 1
+      if (currentVal - 1 <= 1) {
+        $(this).prop('disabled', true);
+      }
+    }
+  });
+
+  });
+</script>
+{% endblock %}
